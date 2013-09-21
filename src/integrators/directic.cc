@@ -54,7 +54,6 @@ directIC_t::directIC_t(bool transpShad, int shadowDepth, int rayDepth)
 	usePhotonCaustics = false;
 	sDepth = shadowDepth;
 	rDepth = rayDepth;
-	//intpb = 0;
 	integratorName = "DirectIC";
 	integratorShortName = "DIC";
 }

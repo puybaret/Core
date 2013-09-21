@@ -892,8 +892,8 @@ colorA_t photonIC_t::integrate(renderState_t &state, diffRay_t &ray) const
 							float dy = RI_S(state.pixelSample, state.samplingOffs);
 							vector3d_t dU(0.f), dV(0.f);
 							createCS(ray.dir, dU, dV);
-							ray.xdir = (dx+1.f)*dU + dy*dV +ray.dir;
-							ray.ydir = dx*dU + (dy+1.f)*dV + ray.dir;  //povman change: from ray.xdir to ray.ydir
+							ray.xdir = (dx+1.f)*dU + dy*dV + ray.dir;
+							ray.ydir = dx*dU + (dy+1.f)*dV + ray.dir; //povman change: from ray.xdir to ray.ydir
 							ray.hasDifferentials = true;
 						}
 
@@ -961,10 +961,8 @@ colorA_t photonIC_t::integrate(renderState_t &state, diffRay_t &ray) const
 		}
 		// add caustics..
 		if(bsdfs & BSDF_DIFFUSE) col += estimateCausticPhotons(state, sp, wo);
-
 		//
 		recursiveRaytrace(state, ray, bsdfs, sp, wo, col, alpha);
-
 		//
 		if(transpRefractedBackground)
 		{
@@ -1267,12 +1265,10 @@ color_t photonIC_t::finalIC(renderState_t &state, const surfacePoint_t &sp, cons
 
 extern "C"
 {
-
 	YAFRAYPLUGIN_EXPORT void registerPlugin(renderEnvironment_t &render)
 	{
 		render.registerFactory("photonIC", photonIC_t::factory);
 	}
-
 }
 
 __END_YAFRAY
