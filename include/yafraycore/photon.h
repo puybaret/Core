@@ -37,7 +37,7 @@ class dirConverter_t
 			else if(p<0) p+=256;
 			return std::pair<unsigned char,unsigned char>(t,p);
 		}
-		
+
 	protected:
 		PFLOAT cosphi[256];
 		PFLOAT sinphi[256];
@@ -72,7 +72,7 @@ class photon_t
 		const point3d_t & position()const {return pos;};
 		const color_t color()const {return c;};
 		void color(const color_t &col) {c=col;};
-		vector3d_t direction()const 
+		vector3d_t direction()const
 		{
 #ifdef _SMALL_PHOTONS
 			if(theta==255) return vector3d_t(0,0,0);
@@ -95,7 +95,7 @@ class photon_t
 			dir=d;
 #endif
 		}
-	
+
 		point3d_t pos;
 #ifdef _SMALL_PHOTONS
 		rgbe_t c;
