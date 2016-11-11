@@ -2,7 +2,6 @@
 #include <materials/shinydiff.h>
 #include <utilities/sample_utils.h>
 #include <materials/microfacet.h>
-#include <core_api/camera.h>
 
 __BEGIN_YAFRAY
 
@@ -271,8 +270,6 @@ color_t shinyDiffuseMat_t::eval(const renderState_t &state, const surfacePoint_t
 
     float wireFrameAmount = (mWireFrameShader ? mWireFrameShader->getScalar(stack) * mWireFrameAmount : mWireFrameAmount);
     applyWireFrame(result, wireFrameAmount, sp);
-
-    result.blend01(color_t(0.5,0.5,0.5),(state.cam->getPosition()-sp.P).length()/100.f);
 
     return result;
 }
