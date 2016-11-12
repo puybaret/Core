@@ -39,10 +39,9 @@ class YAFRAYCORE_EXPORT texture_t
 		void colorRampCreate(std::string modeStr, std::string interpolationStr, std::string hue_interpolationStr) { color_ramp = new color_ramp_t(modeStr, interpolationStr, hue_interpolationStr); } 
 		void colorRampAddItem(colorA_t color, float position) { color_ramp->add_item(color, position); }
 		virtual ~texture_t() { if(color_ramp) { delete color_ramp; color_ramp = nullptr; } }
-		bool get_distance_blur_enabled() const { return distance_blur_enabled; }
-		float get_distance_blur_factor() const { return distance_blur_factor; }
-		float get_distance_blur_dist_min() const { return distance_blur_dist_min; }
-		float get_distance_blur_dist_max() const { return distance_blur_dist_max; }
+		bool get_distance_avg_enabled() const { return distance_avg_enabled; }
+		float get_distance_avg_dist_min() const { return distance_avg_dist_min; }
+		float get_distance_avg_dist_max() const { return distance_avg_dist_max; }
 	
 	protected:
 		float adj_intensity = 1.f;
@@ -56,10 +55,9 @@ class YAFRAYCORE_EXPORT texture_t
 		bool adjustments_set = false;
 		color_ramp_t * color_ramp = nullptr;
 
-		bool distance_blur_enabled = false; //!< Distance blur function that blurs a texture when it's far from the camera, to reduce noise from far shots but keep texture details in close shots
-		float distance_blur_factor = 0.f;	//!< Distance blur factor = 0.f disables that functionality. The bigger the more blurred but the slower during texture initialization
-		float distance_blur_dist_min = 0.f;	//!< Distance (camera to sp) up to which the original "not blurred" texture is used
-		float distance_blur_dist_max = 0.f;	//!< Distance (camera to sp) from which the blurred texture is used. Between the dist_min and dist_max a progressive "blend" will be done between "not blurred" and "blurred" textures
+		bool distance_avg_enabled = false; //!< Distance averaging function that "blurs" a texture when it's far from the camera, to reduce noise/artifacts from far shots but keep texture details in close shots
+		float distance_avg_dist_min = 0.f;	//!< Distance (camera to surface point) up to which the texture is used
+		float distance_avg_dist_max = 0.f;	//!< Distance (camera to surface point) from which the single averaged texture color will be used. Between dist_min and dist_max, a progressive blend between texture and average color will be used.
 };
 
 inline void angmap(const point3d_t &p, float &u, float &v)

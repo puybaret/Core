@@ -511,9 +511,9 @@ texture_t *textureImage_t::factory(paraMap_t &params, renderEnvironment_t &rende
 	bool mirror_y = false;
 	float intensity = 1.f, contrast = 1.f, saturation = 1.f, hue = 0.f, factor_red = 1.f, factor_green = 1.f, factor_blue = 1.f;
 	bool clamp = false;
-	float distance_blur_factor = 2.f;
-	float distance_blur_dist_min = 70.f;
-	float distance_blur_dist_max = 100.f;
+	bool distance_avg_enabled = false;
+	float distance_avg_dist_min = 0.f;
+	float distance_avg_dist_max = 100.f;
 	
 	params.getParam("xrepeat", xrep);
 	params.getParam("yrepeat", yrep);
@@ -540,9 +540,9 @@ texture_t *textureImage_t::factory(paraMap_t &params, renderEnvironment_t &rende
 	params.getParam("adj_hue", hue);
 	params.getParam("adj_clamp", clamp);
 	
-	params.getParam("distance_blur_factor", distance_blur_factor);
-	params.getParam("distance_blur_dist_min", distance_blur_dist_min);
-	params.getParam("distance_blur_dist_max", distance_blur_dist_max);
+	params.getParam("distance_avg_enabled", distance_avg_enabled);
+	params.getParam("distance_avg_dist_min", distance_avg_dist_min);
+	params.getParam("distance_avg_dist_max", distance_avg_dist_max);
 	
 	tex->xrepeat = xrep;
 	tex->yrepeat = yrep;
@@ -560,14 +560,12 @@ texture_t *textureImage_t::factory(paraMap_t &params, renderEnvironment_t &rende
 	
 	tex->setAdjustments(intensity, contrast, saturation, hue, clamp, factor_red, factor_green, factor_blue);
 	
-	if(distance_blur_factor > 0.f)
+	if(distance_avg_enabled)
 	{
-		tex->distance_blur_enabled = true;
-		tex->distance_blur_factor = distance_blur_factor;
-		tex->distance_blur_dist_min = distance_blur_dist_min;
-		tex->distance_blur_dist_max = distance_blur_dist_max;
+		tex->distance_avg_enabled = true;
+		tex->distance_avg_dist_min = distance_avg_dist_min;
+		tex->distance_avg_dist_max = std::max(distance_avg_dist_min, distance_avg_dist_max);
 		if(!tex->postProcessedImage) tex->postProcessedCreate();
-		//tex->postProcessedBlur(distance_blur_factor);
 		tex->postProcessedAverage();
 	}
 	

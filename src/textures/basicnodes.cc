@@ -164,24 +164,24 @@ void textureMapper_t::eval(nodeStack_t &stack, const renderState_t &state, const
 	colorA_t result_color = tex->getColor(texpt);
 	float result_value = (doScalar) ? tex->getFloat(texpt) : 0.f;
 
-	if(tex->get_distance_blur_enabled())
+	if(tex->get_distance_avg_enabled())
 	{
 		float distance = (state.cam->getPosition()-sp.P).length();
-		if(distance > tex->get_distance_blur_dist_min())
+		if(distance > tex->get_distance_avg_dist_min())
 		{
-			colorA_t result_color_blurred = tex->getColor(texpt, true);
-			float result_value_blurred = (doScalar) ? tex->getFloat(texpt, true) : 0.f;
+			colorA_t result_color_averaged = tex->getColor(texpt, true);
+			float result_value_averaged = (doScalar) ? tex->getFloat(texpt, true) : 0.f;
 			
-			if(distance < tex->get_distance_blur_dist_max())
+			if(distance < tex->get_distance_avg_dist_max())
 			{
-				float distance_factor = (distance - tex->get_distance_blur_dist_min()) / (tex->get_distance_blur_dist_max() - tex->get_distance_blur_dist_min());
-				result_color.blend(result_color_blurred, distance_factor);
-				result_value = result_value * (1.f - distance_factor) + result_value_blurred * distance_factor;
+				float distance_factor = (distance - tex->get_distance_avg_dist_min()) / (tex->get_distance_avg_dist_max() - tex->get_distance_avg_dist_min());
+				result_color.blend(result_color_averaged, distance_factor);
+				result_value = result_value * (1.f - distance_factor) + result_value_averaged * distance_factor;
 			}
 			else
 			{
-				result_color = result_color_blurred;
-				result_value = result_value_blurred;
+				result_color = result_color_averaged;
+				result_value = result_value_averaged;
 			}
 		}
 	}
