@@ -17,6 +17,7 @@ __BEGIN_YAFRAY
 #define TYPE_STRING 4
 #define TYPE_POINT  5
 #define TYPE_COLOR  6
+#define TYPE_POINTER 7
 #define TYPE_NONE   -1
 
 /*! a class that can hold exactly one value of a range types.
@@ -31,6 +32,7 @@ class YAFRAYCORE_EXPORT parameter_t
 		parameter_t(double f): used(false), vtype(TYPE_FLOAT) { fval=f; }
 		parameter_t(const colorA_t &c): used(false), vtype(TYPE_COLOR) { C[0]=c.R, C[1]=c.G, C[2]=c.B, C[3]=c.A; }
 		parameter_t(const point3d_t &p): used(false), vtype(TYPE_POINT){ P[0]=p.x, P[1]=p.y, P[2]=p.z; }
+        parameter_t(const unsigned char *p): used(false), vtype(TYPE_POINTER) { pval=p; }
 //		parameter_t(const parameter_t &p);
 		parameter_t(): used(false), vtype(TYPE_NONE) {};
 		~parameter_t(){};
@@ -46,6 +48,7 @@ class YAFRAYCORE_EXPORT parameter_t
 		bool getVal(point3d_t &p)	const {used=true; if(vtype==TYPE_POINT){p.x=P[0], p.y=P[1], p.z=P[2]; return true;} return false;};
 		bool getVal(color_t &c)		const {used=true; if(vtype==TYPE_COLOR){c.R=C[0], c.G=C[1], c.B=C[2]; return true;} return false;};
 		bool getVal(colorA_t &c)	const {used=true; if(vtype==TYPE_COLOR){c.R=C[0], c.G=C[1], c.B=C[2], c.A=C[3]; return true;} return false;};
+        bool getVal(const unsigned char * &p) const {used=true; if(vtype==TYPE_POINTER){p=pval; return true;} return false;};
 		//! return the type of the parameter_t
 		int type()const { return vtype; }
 		// operator= assigns new value, be aware that this may change the parameter type!
@@ -55,7 +58,8 @@ class YAFRAYCORE_EXPORT parameter_t
 		parameter_t &operator = (float f) { vtype=TYPE_FLOAT; fval=f; return *this; }
 		parameter_t &operator = (const point3d_t &p) { vtype=TYPE_POINT; P[0]=p.x, P[1]=p.y, P[2]=p.z; return *this; }
 		parameter_t &operator = (const colorA_t &c) { vtype=TYPE_COLOR; C[0]=c.R, C[1]=c.G, C[2]=c.B, C[3]=c.A; return *this; }
-		
+        parameter_t &operator = (const unsigned char *p) { vtype=TYPE_POINTER; pval=p; return *this; }
+
 		mutable bool used; //! indicate whether the parameter was read (sucessfully) before
 	protected:
 		std::string str;
@@ -68,6 +72,7 @@ class YAFRAYCORE_EXPORT parameter_t
 			bool bval;
 			float C[4];
 			float P[4];
+            const unsigned char *pval;
 			//float matrix[4][4];
 		};
 		int vtype; //!< type of the stored value

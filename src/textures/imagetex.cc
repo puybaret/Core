@@ -28,6 +28,95 @@
 
 __BEGIN_YAFRAY
 
+// An image handler able to decode image data stored in memory 
+class dataHandler_t: public imageHandler_t
+{
+public:
+    dataHandler_t();
+    ~dataHandler_t();
+    bool loadFromFile(const std::string &name);
+    bool loadFromData(const yByte *data, paraMap_t &params);
+    bool saveToFile(const std::string &name, int imgIndex = 0);
+};
+
+dataHandler_t::dataHandler_t()
+{
+  m_MultiLayer = false;
+  
+  handlerName = "DataHandler";
+}
+
+dataHandler_t::~dataHandler_t()
+{
+  clearImgBuffers();
+}
+
+bool dataHandler_t::saveToFile(const std::string &name, int imgIndex)
+{
+  return false;
+}
+
+bool dataHandler_t::loadFromFile(const std::string &name)
+{
+    return false;
+}
+  
+bool dataHandler_t::loadFromData(const yByte *data, paraMap_t &params)
+{
+    int width = 0;
+    int height = 0;
+    int channels = 0;
+
+    params.getParam("width", width);
+    params.getParam("height", height);
+    params.getParam("channels", channels);
+
+    m_width = width;
+    m_height = height;
+    m_hasAlpha = channels == 4;
+    m_grayscale = channels == 1;
+
+    clearImgBuffers();
+    imgBuffer.push_back(new imageBuffer_t(width, height, channels, getTextureOptimization()));
+  
+    float divisor = 255;
+    for(int x = 0; x < width; x++)
+  {
+    for(int y = 0; y < height; y++)
+    {
+      colorA_t color;
+      
+      int i = (x + y * width) * channels;
+
+            switch(channels)
+            {
+                case 4:
+                    color.set(data[i+3] / divisor,
+                              data[i+2] / divisor,
+                              data[i+1] / divisor,
+                              data[i] / divisor);
+                    break;
+                case 3:
+                    color.set(data[i+2] / divisor,
+                              data[i+1] / divisor,
+                              data[i] / divisor,
+                              1.f);
+                    break;
+                case 1:
+                    color.set(data[i] / divisor,
+                              data[i] / divisor,
+                              data[i] / divisor,
+                              1.f);
+                    break;
+            }
+      imgBuffer.at(0)->setColor(x, y, color, m_colorSpace, m_gamma);
+    }
+  }
+
+    return true;
+}
+
+
 float * textureImage_t::ewaWeightLut = nullptr;
 
 textureImage_t::textureImage_t(imageHandler_t *ih, int intp, float gamma, colorSpaces_t color_space):
@@ -540,6 +629,7 @@ int string2cliptype(const std::string *clipname)
 texture_t *textureImage_t::factory(paraMap_t &params, renderEnvironment_t &render)
 {
 	const std::string *name = nullptr;
+    const yByte *data = nullptr;
 	const std::string *intpstr = nullptr;
 	double gamma = 1.0;
 	double expadj = 0.0;
@@ -557,12 +647,13 @@ texture_t *textureImage_t::factory(paraMap_t &params, renderEnvironment_t &rende
 	params.getParam("exposure_adjust", expadj);
 	params.getParam("normalmap", normalmap);
 	params.getParam("filename", name);
+    params.getParam("data", data);
 	params.getParam("texture_optimization", texture_optimization_string);
 	params.getParam("img_grayscale", img_grayscale);
 	
-	if(!name)
+	if(!name && !data)
 	{
-		Y_ERROR << "ImageTexture: Required argument filename not found for image texture" << yendl;
+		Y_ERROR << "ImageTexture: Required argument filename or data not found for image texture " << yendl;
 		return nullptr;
 	}
 	
@@ -577,26 +668,33 @@ texture_t *textureImage_t::factory(paraMap_t &params, renderEnvironment_t &rende
 		else if (*intpstr == "mipmap_ewa") intp = INTP_MIPMAP_EWA;
 	}
 		
-	size_t lDot = name->rfind(".") + 1;
-	size_t lSlash = name->rfind("/") + 1;
-	
-	std::string ext = toLower(name->substr(lDot));
-	
-	std::string fmt = render.getImageFormatFromExtension(ext);
-	
-	if(fmt == "")
-	{
-		Y_ERROR << "ImageTexture: Image extension not recognized, dropping texture." << yendl;
-		return nullptr;
-	}
-	
-	paraMap_t ihpm;
-	ihpm["type"] = fmt;
-	ihpm["for_output"] = false;
-	std::string ihname = "ih";
-	ihname.append(toLower(name->substr(lSlash, lDot - lSlash - 1)));
-	
-	ih = render.createImageHandler(ihname, ihpm);
+    if (name)
+    {
+        size_t lDot = name->rfind(".") + 1;
+        size_t lSlash = name->rfind("/") + 1;
+        
+        std::string ext = toLower(name->substr(lDot));
+        
+        std::string fmt = render.getImageFormatFromExtension(ext);
+        
+        if(fmt == "")
+        {
+            Y_ERROR << "ImageTexture: Image extension not recognized, dropping texture." << yendl;
+            return nullptr;
+        }
+        
+        paraMap_t ihpm;
+        ihpm["type"] = fmt;
+        ihpm["for_output"] = false;
+        std::string ihname = "ih";
+        ihname.append(toLower(name->substr(lSlash, lDot - lSlash - 1)));
+        
+        ih = render.createImageHandler(ihname, ihpm);
+    }
+    else
+    {
+        ih = new dataHandler_t();
+    }
 	
 	if(!ih)
 	{
@@ -630,11 +728,22 @@ texture_t *textureImage_t::factory(paraMap_t &params, renderEnvironment_t &rende
 	ih->setTextureOptimization(texture_optimization);	//FIXME DAVID: Maybe we should leave this to imageHandler factory code...
 	ih->setGrayScaleSetting(img_grayscale);
 	
-	if(!ih->loadFromFile(*name))
-	{
-		Y_ERROR << "ImageTexture: Couldn't load image file, dropping texture." << yendl;
-		return nullptr;
-	}
+    if(name) {
+        if (!ih->loadFromFile(*name))
+        {
+            Y_ERROR << "ImageTexture: Couldn't load image file, dropping texture." << yendl;
+            return nullptr;
+        }
+    }
+    else
+    {
+        if (!((dataHandler_t *)ih)->loadFromData(data, params))
+        {
+            Y_ERROR << "ImageTexture: Couldn't read image data, dropping texture." << yendl;
+            return nullptr;
+        }
+    }
+    
 
 	tex = new textureImage_t(ih, intp, gamma, color_space);
 
