@@ -275,6 +275,18 @@ light_t* renderEnvironment_t::createLight(const std::string &name, paraMap_t &pa
 	return nullptr;
 }
 
+light_t* renderEnvironment_t::removeLight(const std::string &name)
+{
+	auto i = light_table.find(name);
+	if(i == light_table.end() )
+	{
+		return nullptr;
+	}
+	light_t* light = i->second;
+	light_table.erase(i);
+	return light;
+}
+
 texture_t* renderEnvironment_t::createTexture(const std::string &name, paraMap_t &params)
 {
 	std::string pname = "Texture";
@@ -390,6 +402,35 @@ background_t* renderEnvironment_t::createBackground(const std::string &name, par
 	}
 	ErrOnCreate(type);
 	return nullptr;
+}
+
+background_t* renderEnvironment_t::removeBackground(const std::string &name)
+{
+	auto i = background_table.find(name);
+	if(i == background_table.end() )
+	{
+		return nullptr;
+	}
+	background_t* background = i->second;
+	background_table.erase(i);
+
+	// Delete lights associated to background	
+	auto i2 = light_table.begin();
+	while (i2 != light_table.end())
+	{
+		light_t* light = i2->second;
+		if (light->getBackground() == background) 
+		{
+			getScene()->removeLight(light);
+			i2 = light_table.erase(i2);
+			delete light;
+		} 
+		else
+		{ 
+			i2++;
+		} 
+	}
+	return background;
 }
 
 imageHandler_t* renderEnvironment_t::createImageHandler(const std::string &name, paraMap_t &params, bool addToTable)
@@ -515,6 +556,26 @@ camera_t* renderEnvironment_t::createCamera(const std::string &name, paraMap_t &
 	return nullptr;
 }
 
+camera_t* renderEnvironment_t::removeCamera(const std::string &name)
+{
+	auto i = camera_table.find(name);
+	if(i == camera_table.end() )
+	{
+		return nullptr;
+	}
+	camera_t* camera = i->second;
+	camera_table.erase(i);
+	
+	// Remove view name	
+	auto i2 = std::find(renderPasses.view_names.begin(), renderPasses.view_names.end(), camera->get_view_name());
+	if (i2 != renderPasses.view_names.end()) 
+	{
+		renderPasses.view_names.erase(i2);
+	}
+
+	return camera;
+}
+
 integrator_t* renderEnvironment_t::createIntegrator(const std::string &name, paraMap_t &params)
 {
 	std::string pname = "Integrator";
@@ -543,6 +604,19 @@ integrator_t* renderEnvironment_t::createIntegrator(const std::string &name, par
 	}
 	ErrOnCreate(type);
 	return nullptr;
+}
+
+integrator_t* renderEnvironment_t::removeIntegrator(const std::string &name)
+{
+	auto i = integrator_table.find(name);
+	if(i == integrator_table.end() )
+	{
+		return nullptr;
+	}
+	integrator_t* integrator = i->second;
+	integrator_table.erase(i);
+	
+	return integrator;
 }
 
 void renderEnvironment_t::setupRenderPasses(const paraMap_t &params)

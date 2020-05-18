@@ -739,6 +739,24 @@ bool scene_t::addLight(light_t *l)
 	return false;
 }
 
+bool scene_t::removeLight(light_t *l)
+{
+	if(l != 0)
+	{
+		auto i = std::find(lights.begin(), lights.end(), l);
+		if (i == lights.end()) {
+			return false;
+		}
+		else 
+		{
+			lights.erase(i);
+			state.changes |= C_LIGHT;
+			return true;
+		}
+	}
+	return false;
+}
+
 void scene_t::setCamera(camera_t *cam)
 {
 	camera = cam;

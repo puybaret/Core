@@ -167,6 +167,7 @@ class YAFRAYCORE_EXPORT scene_t
 		bool update();
 
 		bool addLight(light_t *l);
+		bool removeLight(light_t *l);
 		bool addMaterial(material_t *m, const char* name);
 		objID_t getNextFreeID();
 		bool addObject(object3d_t *obj, objID_t &id);

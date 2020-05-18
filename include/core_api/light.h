@@ -61,6 +61,7 @@ class light_t
 		virtual ~light_t() {}
 		//! This method must be called right after the factory is called on a background light or the light will fail
 		virtual void setBackground(background_t *bg) { background = bg; }
+		virtual background_t *getBackground() { return background; }
 		//! Enable/disable entire light source
 		bool lightEnabled() const { return lLightEnabled;}
 		bool castShadows() const { return lCastShadows; }

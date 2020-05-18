@@ -57,12 +57,16 @@ class YAFRAYCORE_EXPORT renderEnvironment_t
 		scene_t * 		getScene() { return curren_scene; };
 		
 		light_t* 		createLight		(const std::string &name, paraMap_t &params);
+		light_t*	 	removeLight		(const std::string &name);
 		texture_t* 		createTexture	(const std::string &name, paraMap_t &params);
 		material_t* 	createMaterial	(const std::string &name, paraMap_t &params, std::list<paraMap_t> &eparams);
 		object3d_t* 	createObject	(const std::string &name, paraMap_t &params);
 		camera_t* 		createCamera	(const std::string &name, paraMap_t &params);
+		camera_t* 		removeCamera	(const std::string &name);
 		background_t* 	createBackground(const std::string &name, paraMap_t &params);
+		background_t* 	removeBackground(const std::string &name);
 		integrator_t* 	createIntegrator(const std::string &name, paraMap_t &params);
+		integrator_t* 	removeIntegrator(const std::string &name);
 		shaderNode_t* 	createShaderNode(const std::string &name, paraMap_t &params);
 		volumeHandler_t* createVolumeH(const std::string &name, const paraMap_t &params);
 		VolumeRegion*	createVolumeRegion(const std::string &name, paraMap_t &params);
