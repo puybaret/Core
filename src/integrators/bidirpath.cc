@@ -168,8 +168,8 @@ biDirIntegrator_t::biDirIntegrator_t(bool transpShad, int shadowDepth): trShad(t
 biDirIntegrator_t::~biDirIntegrator_t()
 {
 	//done in cleanup() now...
-	//for(unsigned int i=0; i<pathData.lightPath.size(); ++i) free(pathData.lightPath[i].userdata);
-	//for(unsigned int i=0; i<pathData.eyePath.size(); ++i) free(pathData.eyePath[i].userdata);
+	//for(unsigned int i=0; i<pathData.lightPath.size(); ++i) delete [] pathData.lightPath[i].userdata;
+	//for(unsigned int i=0; i<pathData.eyePath.size(); ++i) delete [] pathData.eyePath[i].userdata;
 }
 
 bool biDirIntegrator_t::preprocess()
@@ -184,8 +184,8 @@ bool biDirIntegrator_t::preprocess()
 		pathData.eyePath.resize(MAX_PATH_LENGTH);
 		pathData.lightPath.resize(MAX_PATH_LENGTH);
 		pathData.path.resize(MAX_PATH_LENGTH*2 + 1);
-		for(int i=0; i<MAX_PATH_LENGTH; ++i) pathData.lightPath[i].userdata = malloc(USER_DATA_SIZE);
-		for(int i=0; i<MAX_PATH_LENGTH; ++i) pathData.eyePath[i].userdata = malloc(USER_DATA_SIZE);
+		for(int i=0; i<MAX_PATH_LENGTH; ++i) pathData.lightPath[i].userdata = new unsigned char [USER_DATA_SIZE];
+		for(int i=0; i<MAX_PATH_LENGTH; ++i) pathData.eyePath[i].userdata = new unsigned char [USER_DATA_SIZE];
 		pathData.nPaths = 0;
 	}
 	// initialize userdata (todo!)

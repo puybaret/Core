@@ -65,11 +65,11 @@ class GridVolume : public DensityVolume {
 			sizeZ = 60;
 			*/
 			
-			grid = (float***)malloc(sizeX * sizeof(float));
+			grid = new float** [sizeX];
 			for (int x = 0; x < sizeX; ++x) {
-				grid[x] = (float**)malloc(sizeY * sizeof(float));
+				grid[x] = new float * [sizeY];
 				for (int y = 0; y < sizeY; ++y) {
-					grid[x][y] = (float*)malloc(sizeZ * sizeof(float));
+					grid[x][y] = new float [sizeZ];
 				}
 			}
 
@@ -97,11 +97,11 @@ class GridVolume : public DensityVolume {
 			
 			for (int x = 0; x < sizeX; ++x) {
 				for (int y = 0; y < sizeY; ++y) {
-					free(grid[x][y]);	
+					delete [] grid[x][y];	
 				}
-				free(grid[x]);
+				delete [] grid[x];
 			}
-			free(grid);
+			delete [] grid;
 		}
 		
 		virtual float Density(point3d_t p);

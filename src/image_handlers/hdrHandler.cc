@@ -176,7 +176,7 @@ bool hdrHandler_t::readHeader(FILE *fp)
 {
 	std::string line;
 	int line_size = 1000;
-	char* linebuf = (char*) malloc(line_size);
+	char* linebuf = new char [line_size];
 
 	fgets(linebuf, line_size, fp); 
 	line = std::string(linebuf);
@@ -184,7 +184,7 @@ bool hdrHandler_t::readHeader(FILE *fp)
 	if (line.find("#?") == std::string::npos)
 	{
 		Y_ERROR << handlerName << ": File is not a valid Radiance RBGE image..." << yendl;
-		free(linebuf);
+		delete [] linebuf;
 		return false;
 	}
 
@@ -208,7 +208,7 @@ bool hdrHandler_t::readHeader(FILE *fp)
 			if(line.substr(foundPos+7).find("32-bit_rle_rgbe") == std::string::npos)
 			{
 				Y_ERROR << handlerName << ": Sorry this is an XYZE file, only RGBE images are supported..." << yendl;
-				free(linebuf);
+				delete [] linebuf;
 				return false;
 			}
 		}
@@ -268,7 +268,7 @@ bool hdrHandler_t::readHeader(FILE *fp)
 		header.step[f] = -1;
 	}
 
-	free(linebuf);
+	delete linebuf;
 	return true;
 }
 

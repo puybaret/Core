@@ -604,7 +604,7 @@ void textureImage_t::generateEWALookupTable()
 	if(!ewaWeightLut)
 	{
 		Y_DEBUG << "** GENERATING EWA LOOKUP **" << yendl;
-		ewaWeightLut = (float *) malloc(sizeof(float) * EWA_WEIGHT_LUT_SIZE);
+		ewaWeightLut = new float [EWA_WEIGHT_LUT_SIZE];
 		for(int i = 0; i < EWA_WEIGHT_LUT_SIZE; ++i)
 		{
 			float alpha = 2.f;

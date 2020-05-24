@@ -72,7 +72,7 @@ public:
 				{
 					color_t lcol(0.0);
 
-					float* attenuationGrid = (float*)malloc(xSize * ySize * zSize * sizeof(float));
+					float* attenuationGrid = new float [xSize * ySize * zSize];
 					vr->attenuationGridMap[(*l)] = attenuationGrid;
 
 					for (int z = 0; z < zSize; ++z)

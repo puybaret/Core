@@ -24,32 +24,11 @@ typedef unsigned int u_int32;
 
 inline void * y_memalign(size_t bound, size_t size)
 {
-#if (defined (_WIN32) && (defined (_MSC_VER)) || defined (__MINGW32__)) //Added by DarkTide to enable mingw32 compliation
-	return _aligned_malloc(size, bound);
-#elif defined(__APPLE__)
-	// there's no good aligned allocation on OS X it seems :/
-	// however, malloc is supposed to return at least SSE2 compatible alignment, which has to be enough.
-	// alternative would be valloc, but i have no good info on its effects.
-	return malloc(size);
-//#elif defined(__FreeBSD__)
-#else
-	// someone check if this maybe is available on OS X meanwhile...thx :)
-	void *ret;
-	if (posix_memalign(&ret, bound, size) != 0)
-		return (nullptr);
-	else
-		return (ret);
-//#else 
-//	return memalign(bound, size);
-#endif
+	return new unsigned char [size];
 }
 
 inline void y_free(void *ptr) {
-#if (defined (_WIN32) && (defined (_MSC_VER)) || defined (__MINGW32__)) //Added by DarkTide to enable mingw32 compliation
-	_aligned_free(ptr);
-#else 
-	free(ptr);
-#endif 
+	delete [] (unsigned char *)ptr;
 }
 
 
