@@ -268,7 +268,7 @@ bool hdrHandler_t::readHeader(FILE *fp)
 		header.step[f] = -1;
 	}
 
-	delete linebuf;
+	delete [] linebuf;
 	return true;
 }
 
